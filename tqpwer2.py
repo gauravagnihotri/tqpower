@@ -118,8 +118,17 @@ def calculate(
 
     engine_power_output = engine_torque * engine_speed_rad_per_sec / 1000
 
+    # calculate wheel speed in radians per second
+    wheel_speed_rad_per_sec = engine_speed_rad_per_sec / gear_ratio / axle_ratio
+    # convert wheel speed in rpm
+    wheel_speed_rpm = wheel_speed_rad_per_sec * 60 / (2 * 3.14)
+
     # Calculate torque at wheel
     torque_at_wheel = (engine_torque * gear_ratio * axle_ratio) / 2
+
+    # Calculate Power at wheel
+    power_at_wheel = torque_at_wheel * wheel_speed_rad_per_sec / 1000
+    # power_at_wheel = (engine_power_output * gear_ratio * axle_ratio) / 2
 
     # Calculate force at wheel
     force_at_wheel = torque_at_wheel / wheel_radius
@@ -148,6 +157,8 @@ def calculate(
         vehicle_speed_mph,
         force_at_wheel,
         engine_power_output,
+        power_at_wheel,
+        wheel_speed_rpm,
     )
 
 
@@ -354,6 +365,8 @@ def app():
         vehicle_speed_mph,
         force_at_wheel,
         engine_power_output,
+        power_at_wheel,
+        wheel_speed_rpm,
     ) = calculate(
         vehicle_mass,
         wheel_radius,
@@ -368,13 +381,16 @@ def app():
     )
     st.write("Output")
     st.markdown("""---""")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col7 = st.columns(4)
     col1.metric("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
     col2.metric("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
     col3.metric("Vehicle Acceleration:", "{:.2f} m/s^2".format(acceleration))
-    col4, col5 = st.columns(2)
+    col7.metric("Engine Speed:", "{:.2f} RPM".format(engine_speed))
+    col4, col5, col6, col8 = st.columns(4)
     col4.metric("Vehicle speed:", "{:.2f} mph".format(vehicle_speed_mph))
     col5.metric("Engine power output:", "{:.2f} kW".format(engine_power_output))
+    col6.metric("Power at wheel:", "{:.2f} kW".format(power_at_wheel))
+    col8.metric("Wheel Speed:", "{:.2f} RPM".format(wheel_speed_rpm))
 
     # Display results
     # st.write("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
