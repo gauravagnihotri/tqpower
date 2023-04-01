@@ -66,6 +66,8 @@ def app():
             "Frontal Area": "3.2 m^2",
         }
     )
+    st.title("Input Parameters")
+    st.markdown("""---""")
     # Get inputs from user
     wheel_radius = st.number_input("Enter wheel radius (m):", value=0.43, step=0.01)
     st.write("Ram 1500 wheel radius is 0.43 m for 275/55R20 tires")
@@ -113,18 +115,28 @@ def app():
         axle_ratio,
         engine_speed,
     )
+    st.title("Output")
+    st.markdown("""---""")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
+    col2.metric("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
+    col3.metric("Acceleration:", "{:.2f} m/s^2".format(acceleration))
+    col4.metric("Vehicle speed:", "{:.2f} mph".format(vehicle_speed_mph))
 
     # Display results
-    st.write("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
-    st.write("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
-    st.write("Acceleration:", "{:.2f} m/s^2".format(acceleration))
+    # st.write("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
+    # st.write("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
+    # st.write("Acceleration:", "{:.2f} m/s^2".format(acceleration))
+    st.markdown("""---""")
+    st.title(
+        "Explanation and Equations for Vehicle Torque, Acceleration, and Speed Calculator"
+    )
     st.write("Vehicle Acceleration is calculated using the following equation:")
     st.latex(
         r"""
         a = \frac{F_{wheel} - F_{rolling resistance} - F_{drag}}{m}
         """
     )
-    st.write("Vehicle speed:", "{:.2f} mph".format(vehicle_speed_mph))
     st.write("Vehicle Speed is calculated using the following equation:")
     st.latex(
         r"""
