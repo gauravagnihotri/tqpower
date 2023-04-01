@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import time
 
 st.set_page_config(layout="wide")
 
@@ -309,6 +310,10 @@ def app():
         axle_ratio = st.select_slider(
             "Select axle ratio:", options=[3.21, 3.55, 3.92, 4.10], value=3.92
         )
+
+        with st.spinner("Loading..."):
+            time.sleep(2)
+            st.success("Done!")
     import plotly.graph_objects as go
 
     # import make_subplots function from plotly.subplots
