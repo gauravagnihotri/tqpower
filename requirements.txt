@@ -21,7 +21,7 @@ Babel==2.12.1
 backcall==0.2.0
 beautifulsoup4==4.11.2
 billiard==3.6.4.0
-black @ file:///opt/conda/conda-bld/black_1660237809219/work
+black==23.3.0
 bleach==6.0.0
 blinker==1.5
 bokeh==2.4.3
