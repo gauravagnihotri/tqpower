@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(layout="wide")
+
 # Define constants
 # wheel_radius = 0.3  # meters
 # vehicle_mass = 3500  # kg
