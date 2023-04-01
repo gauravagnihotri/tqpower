@@ -153,7 +153,7 @@ def calculate(
 
 # Define Streamlit app
 def app():
-    st.write(
+    st.title(
         "Kevin and Evan's Dilemma - Vehicle Torque, Acceleration, and Speed Calculator"
     )
     # st.table(
