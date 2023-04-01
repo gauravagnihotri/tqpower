@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 st.set_page_config(layout="wide")
 
@@ -100,6 +101,8 @@ df = pd.DataFrame(torque_curve, columns=["Engine Speed (RPM)", "Engine Torque (l
 df["Engine Torque (Nm)"] = df["Engine Torque (lb-ft)"] * 1.35581795
 # drop the lb-ft column
 df.drop(columns=["Engine Torque (lb-ft)"], inplace=True)
+# convert df into an evenly spaced dataframe
+
 # Define function to calculate torque, acceleration, and vehicle speed
 def calculate(
     vehicle_mass,
@@ -247,8 +250,7 @@ def app():
 
         # engine_speed = st.number_input("Enter engine speed (RPM):", value=2000, step=100)
         engine_speed = st.select_slider(
-            "Engine speed (RPM)",
-            options=df["eng_spd"].values.tolist(),
+            "Engine speed (RPM)", options=df["eng_spd"].values.tolist(), value=3433
         )
         engine_torque = df.loc[
             df["eng_spd"] == engine_speed, "Engine Torque (Nm)"
