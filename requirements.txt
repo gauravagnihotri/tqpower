@@ -163,7 +163,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.4.0
 platformdirs==3.1.1
-plotly @ file:///opt/conda/envs/env/conda-bld/plotly_1680098897493/work/packages/python/plotly/dist/plotly-5.14.0.tar.gz
+plotly==5.14.0
 plotly-express==0.4.1
 pooch==1.7.0
 prometheus-client==0.16.0
