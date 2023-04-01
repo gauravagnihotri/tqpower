@@ -164,9 +164,7 @@ def calculate(
 
 # Define Streamlit app
 def app():
-    st.title(
-        "Kevin and Evan's Dilemma - Vehicle Torque, Acceleration, and Speed Calculator"
-    )
+    st.title("Vehicle Performance Calculator")
     # st.table(
     #     {
     #         "Vehicle Mass": "3500 kg (~7700 lbs))",
@@ -244,14 +242,16 @@ def app():
         #     gear_ratio = 0.84
         # elif selected_gear == "8th":
         #     gear_ratio = 0.67
+        # create a new column in df for engine speed with lower precision
+        df["eng_spd"] = df["Engine Speed (RPM)"].round(decimals=0)
 
         # engine_speed = st.number_input("Enter engine speed (RPM):", value=2000, step=100)
         engine_speed = st.select_slider(
             "Engine speed (RPM)",
-            options=df["Engine Speed (RPM)"].values.tolist(),
+            options=df["eng_spd"].values.tolist(),
         )
         engine_torque = df.loc[
-            df["Engine Speed (RPM)"] == engine_speed, "Engine Torque (Nm)"
+            df["eng_spd"] == engine_speed, "Engine Torque (Nm)"
         ].values[0]
 
         # add engine power output to the dataframe
@@ -355,9 +355,21 @@ def app():
 
     # using hovermode add a vertical line at the engine speed
     fig.update_layout(hovermode="x", hoverdistance=100, spikedistance=1000)
+    fig.update_xaxes(showspikes=True, spikemode="across", spikethickness=1)
+    fig.update_xaxes(spikesnap="data")
+    # add annotation at the engine speed
+    fig.add_annotation(
+        x=engine_speed,
+        y=engine_torque,
+        text="{} RPM <br> {:.2f} Nm".format(engine_speed, engine_torque),
+        showarrow=True,
+        arrowhead=7,
+        ax=-40,
+        ay=-40,
+    )
+
     # add a vertical line at the engine speed
     # Display the plot in the Streamlit app
-    st.plotly_chart(fig, use_container_width=True)
     # Calculate results
     (
         torque_at_wheel,
@@ -379,63 +391,87 @@ def app():
         axle_ratio,
         engine_speed,
     )
-    st.write("Output")
-    st.markdown("""---""")
-    col1, col2, col3, col7 = st.columns(4)
+
+    # add annotation for power output from df at the engine speed
+    fig.add_annotation(
+        x=engine_speed,
+        y=engine_power_output,
+        yref="y2",
+        text="{} RPM <br> {:.2f} kW".format(engine_speed, engine_power_output),
+        showarrow=True,
+        arrowhead=7,
+        ax=40,
+        ay=40,
+    )
+    fig.update_layout(yaxis_range=[350, 550])
+    fig.update_layout(yaxis2_range=[50, 300])
+    fig.update_layout(xaxis_range=[1000, 6000])
+    # fig.update_yaxes(automargin=True)
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=20, b=20),
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # st.write("Output")
+    # st.markdown("""---""")
+    col1, col2, col6, col8 = st.columns(4)
     col1.metric("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
-    col2.metric("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
-    col3.metric("Vehicle Acceleration:", "{:.2f} m/s^2".format(acceleration))
-    col7.metric("Engine Speed:", "{:.2f} RPM".format(engine_speed))
-    col4, col5, col6, col8 = st.columns(4)
-    col4.metric("Vehicle speed:", "{:.2f} mph".format(vehicle_speed_mph))
-    col5.metric("Engine power output:", "{:.2f} kW".format(engine_power_output))
-    col6.metric("Power at wheel:", "{:.2f} kW".format(power_at_wheel))
     col8.metric("Wheel Speed:", "{:.2f} RPM".format(wheel_speed_rpm))
+    col6.metric("Power at wheel:", "{:.2f} kW".format(power_at_wheel))
+    col2.metric("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
+    col7, col5, col4, col3 = st.columns(4)
+    col7.metric("Engine Speed:", "{:.2f} RPM".format(engine_speed))
+    col5.metric("Engine power output:", "{:.2f} kW".format(engine_power_output))
+    col4.metric("Vehicle speed:", "{:.2f} mph".format(vehicle_speed_mph))
+    col3.metric("Vehicle Acceleration:", "{:.2f} m/s^2".format(acceleration))
 
     # Display results
     # st.write("Torque at wheel:", "{:.2f} Nm".format(torque_at_wheel))
     # st.write("Force at wheel:", "{:.2f} Nm".format(force_at_wheel))
     # st.write("Acceleration:", "{:.2f} m/s^2".format(acceleration))
     st.markdown("""---""")
-    st.title(
+    with st.expander(
         "Explanation and Equations for Vehicle Torque, Acceleration, and Speed Calculator"
-    )
-    st.write("Vehicle Acceleration is calculated using the following equation:")
-    st.latex(
-        r"""
-        a = \frac{F_{wheel} - F_{rolling resistance} - F_{drag}}{m}
-        """
-    )
-    st.write("Vehicle Speed is calculated using the following equation:")
-    st.latex(
-        r"""
-        v = \frac{\omega_{engine} * R_{wheel}}{GR * AR} * \frac{3600}{1609.34}
-        """
-    )
-    st.write("where:")
-    st.latex(
-        r"""
-        \omega_{engine} = \frac{2 * \pi * N_{engine}}{60}
-        """
-    )
-    st.write("and:")
-    st.latex(
-        r"""
-        F_{wheel} = \frac{T_{engine} * GR * AR}{2 * R_{wheel}}
-        """
-    )
-    st.write("and:")
-    st.latex(
-        r"""
-        F_{rolling resistance} = \mu_{rolling resistance} * m * g
-        """
-    )
-    st.write("and:")
-    st.latex(
-        r"""
-        F_{drag} = \frac{1}{2} * \rho * C_{drag} * A_{frontal} * v^2
-        """
-    )
+    ):
+        # st.title(
+        #     "Explanation and Equations for Vehicle Torque, Acceleration, and Speed Calculator"
+        # )
+        st.write("Vehicle Acceleration is calculated using the following equation:")
+        st.latex(
+            r"""
+            a = \frac{F_{wheel} - F_{rolling resistance} - F_{drag}}{m}
+            """
+        )
+        st.write("Vehicle Speed is calculated using the following equation:")
+        st.latex(
+            r"""
+            v = \frac{\omega_{engine} * R_{wheel}}{GR * AR} * \frac{3600}{1609.34}
+            """
+        )
+        st.write("where:")
+        st.latex(
+            r"""
+            \omega_{engine} = \frac{2 * \pi * N_{engine}}{60}
+            """
+        )
+        st.write("and:")
+        st.latex(
+            r"""
+            F_{wheel} = \frac{T_{engine} * GR * AR}{2 * R_{wheel}}
+            """
+        )
+        st.write("and:")
+        st.latex(
+            r"""
+            F_{rolling resistance} = \mu_{rolling resistance} * m * g
+            """
+        )
+        st.write("and:")
+        st.latex(
+            r"""
+            F_{drag} = \frac{1}{2} * \rho * C_{drag} * A_{frontal} * v^2
+            """
+        )
 
 
 # plot acceleration vs engine speed for each gear
